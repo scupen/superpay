@@ -11,9 +11,11 @@ module Superpay
 
     def url
       if ambiente_producao?
-        return 'https://superpay2.superpay.com.br/checkout/servicosPagamentoCompletoWS.Services?wsdl'
+        return 'https://superpay2.superpay.com.br/checkout/servicosPagamentoOneClickWS.Services?wsdl'
+        # return 'https://superpay2.superpay.com.br/checkout/servicosPagamentoCompletoWS.Services?wsdl'
       else
-        return 'http://homologacao2.superpay.com.br/checkout/servicosPagamentoCompletoWS.Services?wsdl'
+        return 'http://homologacao2.superpay.com.br/checkout/servicosPagamentoOneClickWS.Services?wsdl'
+        # return 'http://homologacao2.superpay.com.br/checkout/servicosPagamentoCompletoWS.Services?wsdl'
       end
     end
 

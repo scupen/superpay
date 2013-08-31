@@ -8,6 +8,7 @@ module Superpay
   autoload :Configuracao, 'superpay/configuracao'
   autoload :Helper, 'superpay/helper'
   autoload :Transacao, 'superpay/transacao'
+  autoload :TransacaoOneClick, 'superpay/transacao_one_click'
 
   #
   # Configura a conexão com o gateway.
