@@ -36,16 +36,12 @@ module Superpay
     def self.pagar(dados)
 
       # Valida os dados passados
-      raise 'Campo obrigatório: token' if dados[:token].blank?
       raise 'Campo obrigatório: numero_transacao' if dados[:numero_transacao].blank?
       raise 'Campo obrigatório: codigo_forma_pagamento' if dados[:codigo_forma_pagamento].blank?
       raise 'Campo obrigatório: valor' if dados[:valor].blank?
-      raise 'Campo obrigatório: nome_titular_cartao_credito' if dados[:nome_titular_cartao_credito].blank?
-      raise 'Campo obrigatório: numero_cartao_credito' if dados[:numero_cartao_credito].blank?
-      raise 'Campo obrigatório: codigo_seguranca' if dados[:codigo_seguranca].blank?
-      raise 'Campo obrigatório: data_validade_cartao' if dados[:data_validade_cartao].blank?
       raise 'Campo obrigatório: dados_usuario_transacao' if dados[:dados_usuario_transacao].blank?
       raise 'Campo obrigatório: itens_do_pedido' if dados[:itens_do_pedido].blank?
+      raise 'Campo obrigatório: token' if dados[:token].blank?
 
       # Sobrecarga com dados default
       dados[:codigo_estabelecimento] = ::Superpay.config.estabelecimento
