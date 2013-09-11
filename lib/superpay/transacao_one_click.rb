@@ -37,7 +37,7 @@ module Superpay
 
       # Valida os dados passados
       raise 'Campo obrigatório: numero_transacao' if dados[:numero_transacao].blank?
-      raise 'Campo obrigatório: codigo_forma_pagamento' if dados[:codigo_forma_pagamento].blank?
+      # raise 'Campo obrigatório: codigo_forma_pagamento' if dados[:codigo_forma_pagamento].blank?
       raise 'Campo obrigatório: valor' if dados[:valor].blank?
       raise 'Campo obrigatório: dados_usuario_transacao' if dados[:dados_usuario_transacao].blank?
       raise 'Campo obrigatório: itens_do_pedido' if dados[:itens_do_pedido].blank?
@@ -54,7 +54,7 @@ module Superpay
         retorno = Superpay.conector.call(:pagamento_one_click, {transacao: dados})
         resposta = retorno.to_array(:pagamento_one_click_response, :return).first
       rescue Savon::SOAPFault => error
-        # return {error: error.to_hash[:fault][:faultstring]}
+        return {error: error.to_hash[:fault][:faultstring]}
       end
       
       # Se o estabelecimento retornado for diferente da configuração, deu coisa errada
