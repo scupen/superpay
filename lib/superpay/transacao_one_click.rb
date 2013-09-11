@@ -16,7 +16,7 @@ module Superpay
       raise 'Campo obrigatório: email_comprador' if dados[:email_comprador].blank?
 
       # Sobrecarga com dados default
-      dados[:codigo_estabelecimento] = ::Superpay.config.estabelecimento
+      dados[:codigo_estabelecimento] = ::Superpay.config.estabelecimento if dados[:codigo_estabelecimento].blank?
 
       # Verifica se a resposta veio correta ou se deu problema
       begin
@@ -44,7 +44,7 @@ module Superpay
       raise 'Campo obrigatório: token' if dados[:token].blank?
 
       # Sobrecarga com dados default
-      dados[:codigo_estabelecimento] = ::Superpay.config.estabelecimento
+      dados[:codigo_estabelecimento] = ::Superpay.config.estabelecimento if dados[:codigo_estabelecimento].blank?
 
       # Tratamento dos valores de envio
       dados = TransacaoOneClick.tratar_envio(dados)
