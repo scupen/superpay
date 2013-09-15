@@ -37,10 +37,10 @@ module Superpay
 
       # Valida os dados passados
       raise 'Campo obrigatório: numero_transacao' if dados[:numero_transacao].blank?
-      # raise 'Campo obrigatório: codigo_forma_pagamento' if dados[:codigo_forma_pagamento].blank?
+      raise 'Campo obrigatório: codigo_forma_pagamento' if dados[:codigo_forma_pagamento].blank?
       raise 'Campo obrigatório: valor' if dados[:valor].blank?
       raise 'Campo obrigatório: dados_usuario_transacao' if dados[:dados_usuario_transacao].blank?
-      raise 'Campo obrigatório: itens_do_pedido' if dados[:itens_do_pedido].blank?
+      # raise 'Campo obrigatório: itens_do_pedido' if dados[:itens_do_pedido].blank?
       raise 'Campo obrigatório: token' if dados[:token].blank?
 
       # Sobrecarga com dados default
@@ -57,11 +57,6 @@ module Superpay
         return {error: error.to_hash[:fault][:faultstring]}
       end
       
-      # Se o estabelecimento retornado for diferente da configuração, deu coisa errada
-      # if resposta[:codigo_estabelecimento] != ::Superpay.config.estabelecimento.to_s
-      #   raise "Código do estabelecimento não é o da configuração: #{resposta[:codigo_estabelecimento]}"
-      # end
-
       # Sobrecarga com dados tratados e retorna
       # return TransacaoOneClick.tratar_retorno(resposta)
       return resposta
