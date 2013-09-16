@@ -113,7 +113,7 @@ module Superpay
       transacao[:taxa_embarque] = Helper.to_superpay_number(transacao[:taxa_embarque]) unless transacao[:taxa_embarque].blank?
 
       # valor dos itens do pedido
-      unless dados[:itens_do_pedido].blank?
+      unless transacao[:itens_do_pedido].blank?
         if transacao[:itens_do_pedido].is_a?(Hash)
           transacao[:itens_do_pedido] = [transacao[:itens_do_pedido]]
         end
