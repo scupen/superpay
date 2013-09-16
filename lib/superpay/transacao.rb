@@ -113,11 +113,13 @@ module Superpay
       transacao[:taxa_embarque] = Helper.to_superpay_number(transacao[:taxa_embarque]) unless transacao[:taxa_embarque].blank?
 
       # valor dos itens do pedido
-      if transacao[:itens_do_pedido].is_a?(Hash)
-        transacao[:itens_do_pedido] = [transacao[:itens_do_pedido]]
-      end
-      transacao[:itens_do_pedido].each do |item|
-        item[:valor_unitario_produto] = Helper.to_superpay_number(item[:valor_unitario_produto]) unless item[:valor_unitario_produto].blank?
+      unless dados[:itens_do_pedido].blank?
+        if transacao[:itens_do_pedido].is_a?(Hash)
+          transacao[:itens_do_pedido] = [transacao[:itens_do_pedido]]
+        end
+        transacao[:itens_do_pedido].each do |item|
+          item[:valor_unitario_produto] = Helper.to_superpay_number(item[:valor_unitario_produto]) unless item[:valor_unitario_produto].blank?
+        end
       end
 
       # dados do usuário
