@@ -1,11 +1,15 @@
 # -*- encoding : utf-8 -*-
 
 module Superpay
-  class TransacaoOneClick < Transacao
+  class TransacaoOneClick
+
+    def initialize(config)
+      @conector = Superpay::Conector.new(config, :transacao_one_click)
+    end
 
     #
     # Faz o cadastro do cliente / cartão para pagamento one click.
-    def self.cadastrar(dados)
+    def cadastrar(dados)
 
       # Valida os dados passados
       raise 'Campo obrigatório: forma_pagamento' if dados[:forma_pagamento].blank?
@@ -16,11 +20,11 @@ module Superpay
       raise 'Campo obrigatório: email_comprador' if dados[:email_comprador].blank?
 
       # Sobrecarga com dados default
-      dados[:codigo_estabelecimento] = ::Superpay.config.estabelecimento if dados[:codigo_estabelecimento].blank?
+      # dados[:codigo_estabelecimento] = ::Superpay.config.estabelecimento if dados[:codigo_estabelecimento].blank?
 
       # Verifica se a resposta veio correta ou se deu problema
       begin
-        retorno = Superpay.conector.call(:cadastra_pagamento_one_click, {dados_one_click: dados})
+        retorno = @conector.call(:cadastra_pagamento_one_click, {dados_one_click: dados})
         resposta = retorno.to_array(:cadastra_pagamento_one_click_response, :return).first
       rescue Savon::SOAPFault => error
         return {error: error.to_hash[:fault][:faultstring]}
@@ -33,25 +37,25 @@ module Superpay
     # Faz o pagamento da transação one click, a partir dos dados do gateway.
     # Se a transação já foi feita, seu status de retorno será 31: ja_efetuada. 
     # Caso deseje saber qual o real status da transação, faça uma consulta.
-    def self.pagar(dados)
+    def pagar(dados)
 
       # Valida os dados passados
       raise 'Campo obrigatório: numero_transacao' if dados[:numero_transacao].blank?
-      raise 'Campo obrigatório: codigo_forma_pagamento' if dados[:codigo_forma_pagamento].blank?
+      # raise 'Campo obrigatório: codigo_forma_pagamento' if dados[:codigo_forma_pagamento].blank?
       raise 'Campo obrigatório: valor' if dados[:valor].blank?
       raise 'Campo obrigatório: dados_usuario_transacao' if dados[:dados_usuario_transacao].blank?
       # raise 'Campo obrigatório: itens_do_pedido' if dados[:itens_do_pedido].blank?
       raise 'Campo obrigatório: token' if dados[:token].blank?
 
       # Sobrecarga com dados default
-      dados[:codigo_estabelecimento] = ::Superpay.config.estabelecimento if dados[:codigo_estabelecimento].blank?
+      # dados[:codigo_estabelecimento] = ::Superpay.config.estabelecimento if dados[:codigo_estabelecimento].blank?
 
       # Tratamento dos valores de envio
-      dados = TransacaoOneClick.tratar_envio(dados)
+      dados = Transacao.tratar_envio(dados)
 
       # Verifica se a resposta veio correta ou se deu problema
       begin
-        retorno = Superpay.conector.call(:pagamento_one_click, {transacao: dados})
+        retorno = @conector.call(:pagamento_one_click, {transacao: dados})
         resposta = retorno.to_array(:pagamento_one_click_response, :return).first
       rescue Savon::SOAPFault => error
         return {error: error.to_hash[:fault][:faultstring]}

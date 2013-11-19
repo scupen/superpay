@@ -4,6 +4,10 @@ require 'brdata'
 module Superpay
   class Transacao
 
+    def initialize(config)
+      @conector = Superpay::Conector.new(config, :transacao)
+    end
+
     # CONSTANTES
     IDIOMAS = {portugues: 1, ingles: 2, espanhol: 3}
     STATUS = {
@@ -29,7 +33,7 @@ module Superpay
     # Faz o pagamento da transação, a partir dos dados do gateway.
     # Se a transação já foi feita, seu status de retorno será 31: ja_efetuada. 
     # Caso deseje saber qual o real status da transação, faça uma consulta.
-    def self.pagar(dados)
+    def pagar(dados)
       # Valida os dados passados
       raise 'Campo obrigatório: numero_transacao' if dados[:numero_transacao].blank?
       raise 'Campo obrigatório: codigo_forma_pagamento' if dados[:codigo_forma_pagamento].blank?
@@ -42,7 +46,7 @@ module Superpay
       raise 'Campo obrigatório: itens_do_pedido' if dados[:itens_do_pedido].blank?
 
       # Sobrecarga com dados default
-      dados[:codigo_estabelecimento] = ::Superpay.config.estabelecimento
+      dados[:codigo_estabelecimento] = ::Superpay.config.estabelecimento if dados[:codigo_estabelecimento].blank?
 
       # Tratamento dos valores de envio
       dados = Transacao.tratar_envio(dados)
@@ -56,9 +60,9 @@ module Superpay
       end
       
       # Se o estabelecimento retornado for diferente da configuração, deu coisa errada
-      if resposta[:codigo_estabelecimento] != ::Superpay.config.estabelecimento.to_s
-        raise "Código do estabelecimento não é o da configuração: #{resposta[:codigo_estabelecimento]}"
-      end
+      # if resposta[:codigo_estabelecimento] != ::Superpay.config.estabelecimento.to_s
+      #   raise "Código do estabelecimento não é o da configuração: #{resposta[:codigo_estabelecimento]}"
+      # end
 
       # Sobrecarga com dados tratados e retorna
       return Transacao.tratar_retorno(resposta)
@@ -66,15 +70,14 @@ module Superpay
 
     #
     # Consulta uma transação de acordo com seu número (código).
-    def self.consultar(numero_transacao)
+    def consultar(numero_transacao)
       dados = {
-        codigo_estabelecimento: ::Superpay.config.estabelecimento,
         numero_transacao: numero_transacao
       }
       retorno = Superpay.conector.call(:consulta_transacao_especifica, {consulta_transacao_w_s: dados})
       resposta = retorno.to_array(:consulta_transacao_especifica_response, :return).first
       # Verifica se a resposta veio correta ou se deu problema
-      return {erros: retorno} if !resposta
+      return {error: retorno} if !resposta
       # Se o estabelecimento retornado for diferente da configuração, deu coisa errada
       if resposta[:codigo_estabelecimento] != ::Superpay.config.estabelecimento.to_s
         raise "Código do estabelecimento não é o da configuração: #{resposta[:codigo_estabelecimento]}"
@@ -84,11 +87,43 @@ module Superpay
       return Transacao.tratar_retorno(resposta)
     end
 
-    def self.cancelar(dados)
+    #
+    # Captura uma transação autorizada de acordo com seu número (código).
+    def capturar(numero_transacao)
+      
+      # raise 'Campo obrigatório: numero_transacao' if dados[:numero_transacao].blank?
+
+      dados = {
+        numero_transacao: numero_transacao,
+        operacao: 1
+      }
+
+      # retorno = Superpay.conector.call(:operacao_transacao, {operacao: dados})
+      # resposta = retorno.to_array(:operacao_transacao_response, :return).first
+      # Verifica se a resposta veio correta ou se deu problema
+      # return {error: retorno} if !resposta
+      # Se o estabelecimento retornado for diferente da configuração, deu coisa errada
+      # if resposta[:codigo_estabelecimento] != ::Superpay.config.estabelecimento.to_s
+      #   raise "Código do estabelecimento não é o da configuração: #{resposta[:codigo_estabelecimento]}"
+      # end
+
+      begin
+        retorno = @conector.call(:operacao_transacao, {operacao: dados})
+        resposta = retorno.to_array(:operacao_transacao_response, :return).first
+      rescue Savon::SOAPFault => error
+        return {error: error.to_hash[:fault][:faultstring]}
+      end
+
+      # Sobrecarga com dados tratados e retorna
+      # return Transacao.tratar_retorno(resposta)
+      return resposta
+    end
+
+    def cancelar(dados)
       raise 'Not implemented yet'
     end
 
-    def self.pagar_com_varios_cartoes(dados)
+    def pagar_com_varios_cartoes(dados)
       raise 'Not implemented yet'
     end
 
